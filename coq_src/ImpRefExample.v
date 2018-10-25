@@ -84,8 +84,8 @@ Fixpoint repeat (n:nat) (k: unit -> ?? unit): ?? unit :=
   | S p => k () ;; repeat p k
   end.
 
-Definition hello (_:unit): ?? unit :=
-  repeat 3 (fun _ => println "hello").
+Definition hello (s:pstring): ?? unit :=
+  repeat 3 (fun _ => println s).
 
 (* wrong repeat *)
 Fixpoint wrepeat (n:nat) (k: ?? unit): ?? unit :=
@@ -94,20 +94,27 @@ Fixpoint wrepeat (n:nat) (k: ?? unit): ?? unit :=
   | S p => k ;; wrepeat p k
   end.
 
-Definition whello (_:unit): ?? unit :=
-  wrepeat 3 (println "hello").
+Definition whello (s:pstring): ?? unit :=
+  wrepeat 3 (println s).
 
-Lemma wrong_IO_reasoning:
-  (hello())=(whello()).
+Lemma wrong_IO_reasoning (s:pstring):
+  (hello s)=(whello s).
 Proof.
   unfold hello, whello; simpl. auto.
 Qed.
 
+Definition interactive: bool := false.
+
 Definition test2: ?? unit :=
+  DO s <~ 
+   (if interactive then (
+      print("Enter a line: ");;
+      read_line()
+   ) else RET (Str "hello"));;
   println("version 1");;
-  hello();;
+  hello s;;
   println("version 2");;
-  whello().
+  whello s.
 
 End TestNat.
 

@@ -7,4 +7,3 @@ Impure/ImpIO.v
 Impure/ImpLoops.v
 Impure/ImpHCons.v
 Impure/ImpExtern.v
-TinyImpeqExample.v
