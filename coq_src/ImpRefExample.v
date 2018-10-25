@@ -6,16 +6,6 @@ Require Import Omega.
 Import Notations.
 Local Open Scope impure.
 
-(* We can emulate polymorphic references in Coq only with external functions and products *)
-
-Record cref {A} := {
-  set: A -> ?? unit;
-  get: unit -> ?? A
-}.
-Arguments cref: clear implicits.
-
-Axiom make: forall {A}, A -> ?? cref A.
-Extract Constant make => "(fun x -> let r = ref x in { set = (fun y -> r:=y); get = (fun () -> !r) })".
 
 Local Open Scope nat_scope.
 
@@ -27,31 +17,6 @@ Module TestNat.
 Here is a tiny example...
 
 *)
-
-Record mydata := {
-  history: list nat;
-  the_max: nat;
-  the_max_in_history: List.In the_max history;
-  the_max_is_max: forall x, List.In x history -> x <= the_max
-}.
-
-Program Definition single x : ?? cref (mydata) := 
-  make {| history:= x::nil; the_max := x |}.
-Obligation 2.
-  intuition subst; auto.
-Qed.
-
-
-Program Definition add v (r: cref mydata): ?? unit :=
-  DO d <~ get r ();;
-  set r {| history:=v::(history d); the_max := max v (the_max d) |}.
-Obligation 1.
-  destruct d; simpl; apply Nat.max_case_strong; auto.
- Qed.
-Obligation 2.
-  destruct d; simpl in * |- *; apply Nat.max_case_strong; intuition.
-  lapply (the_max_is_max0 x); auto. omega.
-Qed.
 
 (*
 Remark that in Coq, we only deduce informations from the type ! 
@@ -69,18 +34,20 @@ Here, be aware that we can define aliases in Coq, even if can not reason about t
 
 *)
 
-Definition example_Jaber {A} (x: cref A) (y: cref mydata) : ?? A :=
-  DO rd0 <~ single 0;;
-  DO d0 <~ get rd0 ();;
-  set y d0;;
-  get x ().
+Definition may_alias{A} (x:cref A) (y:cref nat):?? A:=
+  y.(set) 0;;
+  x.(get) ().
 
-Program Definition alias_example (r1: cref mydata) : ?? nat := 
-  DO r2 <~ make (exist (fun r => r = r1) r1 _);; (* r2: cref {r : cref mydata | r = r1} *)
-  DO r <~ example_Jaber r2 r1;; 
+Program Definition alias_example (r1: cref nat) : ?? nat := 
+  DO r2 <~ make_cref (exist (fun r => r = r1) r1 _);; (* r2: cref {r : cref nat | r = r1} *)
+  DO r <~ may_alias r2 r1;; 
   ASSERT ((`r)=r1);; (* this is proved automatically ! *)
-  DO d <~ get r ();;
-  RET (the_max d). (* But, we can not prove that the returned value is [0] *) 
+  get r (). (* But, we can not prove that the returned value is [0] *) 
+
+Program Definition alias_ex (r1: cref nat) : ?? { r | r=r1 } := 
+  DO r2 <~ make_cref (exist (fun r => r = r1) r1 _);; 
+  may_alias r2 r1.
+
 
 (* Now, the issues are the following:
 
@@ -90,17 +57,64 @@ Program Definition alias_example (r1: cref mydata) : ?? nat :=
 
 *)
 
-
 Local Open Scope string_scope.
 
-Definition test: ?? unit :=
-  DO r1 <~ single 10 ;;
+Definition test1: ?? unit :=
+  DO r1 <~ make_cref 10 ;;
   DO v <~ alias_example r1;;
-  assert_b (Nat.eqb v 0) "Ok: we can not prove this. It depends on the implementation of make.";;
+  assert_b (Nat.eqb v 0) "Ok: we cannot prove this. It depends on the implementation of make.";;
   RET tt.
 
 
+Record mydata := {
+  value: nat;
+  bounded: value > 10
+}.
+
+Lemma mydata_preserved (x: cref mydata) (y: cref nat):
+  WHEN may_alias x y ~> v THEN 
+    v.(value) > 10.
+Proof.
+  wlp_simplify. destruct exta0; simpl; auto.
+Qed. 
+
+Fixpoint repeat (n:nat) (k: unit -> ?? unit): ?? unit :=
+  match n with
+  | 0 => RET ()
+  | S p => k () ;; repeat p k
+  end.
+
+Definition hello (_:unit): ?? unit :=
+  repeat 3 (fun _ => println "hello").
+
+(* wrong repeat *)
+Fixpoint wrepeat (n:nat) (k: ?? unit): ?? unit :=
+  match n with
+  | 0 => RET ()
+  | S p => k ;; wrepeat p k
+  end.
+
+Definition whello (_:unit): ?? unit :=
+  wrepeat 3 (println "hello").
+
+Lemma wrong_IO_reasoning:
+  (hello())=(whello()).
+Proof.
+  unfold hello, whello; simpl. auto.
+Qed.
+
+Definition test2: ?? unit :=
+  println("version 1");;
+  hello();;
+  println("version 2");;
+  whello().
+
 End TestNat.
+
+
+(* An other example *)
+Require Import PArith.
+Check forall {A}, (list (positive*A)) -> ??((positive -> ??(option A))*(positive*A -> ??unit)).
 
 
 (*************************)
