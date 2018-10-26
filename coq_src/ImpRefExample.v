@@ -10,6 +10,37 @@ Local Open Scope impure.
 Local Open Scope nat_scope.
 
 
+Section TRIV_WLP.
+
+Variable f: nat -> ?? nat.
+
+Definition g (x:nat): ?? nat :=
+ DO r <~ f x;;
+ RET (r+1).
+
+Lemma triv: forall x, WHEN g x ~> r THEN r > 0.
+Proof.
+  wlp_simplify. omega.
+Qed.
+
+End TRIV_WLP.
+
+
+Section Empty_WLP.
+
+Inductive empty: Type:= Absurd: empty -> empty.
+
+Lemma never_return_empty (f: unit -> ??empty):
+  WHEN f () ~> _ THEN False.
+Proof.
+  wlp_simplify.
+  clear Hexta.
+  induction exta. auto.
+Qed.
+
+End Empty_WLP.
+
+
 Module TestNat.
 
 (* Now, we can embed invariants into these Coq references 
