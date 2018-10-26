@@ -80,27 +80,27 @@ Qed.
 
 Fixpoint repeat (n:nat) (k: unit -> ?? unit): ?? unit :=
   match n with
-  | 0 => RET ()
-  | S p => k () ;; repeat p k
+  | 0 => RET()
+  | S p => k();; repeat p k
   end.
 
-Definition hello (s:pstring): ?? unit :=
+Definition print3 (s:pstring): ?? unit :=
   repeat 3 (fun _ => println s).
 
 (* wrong repeat *)
 Fixpoint wrepeat (n:nat) (k: ?? unit): ?? unit :=
   match n with
-  | 0 => RET ()
-  | S p => k ;; wrepeat p k
+  | 0 => RET()
+  | S p => k;; wrepeat p k
   end.
 
-Definition whello (s:pstring): ?? unit :=
+Definition wprint3 (s:pstring): ?? unit :=
   wrepeat 3 (println s).
 
 Lemma wrong_IO_reasoning (s:pstring):
-  (hello s)=(whello s).
+  (print3 s)=(wprint3 s).
 Proof.
-  unfold hello, whello; simpl. auto.
+  unfold print3, wprint3; simpl. auto.
 Qed.
 
 Definition interactive: bool := false.
@@ -112,9 +112,9 @@ Definition test2: ?? unit :=
       read_line()
    ) else RET (Str "hello"));;
   println("version 1");;
-  hello s;;
+  print3 s;;
   println("version 2");;
-  whello s.
+  wprint3 s.
 
 End TestNat.
 
