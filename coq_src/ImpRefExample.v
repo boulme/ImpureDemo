@@ -41,6 +41,22 @@ Qed.
 End Empty_WLP.
 
 
+Section Pseudo_Identity.
+
+Variable pid: forall A, A->??A.
+
+Program Definition cpid {B} (x:B): ?? B :=
+  DO z <~ pid { y | y = x } x ;;
+  RET `z.
+
+Lemma cpid_correct A (x y:A):
+  WHEN (cpid x) ~> y THEN  y=x.
+Proof.
+  wlp_simplify. destruct exta; subst; auto.
+Qed.
+
+End Pseudo_Identity.
+
 Module TestNat.
 
 (* Now, we can embed invariants into these Coq references 
