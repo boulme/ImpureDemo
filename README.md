@@ -56,4 +56,4 @@ After cloning, just change directory for a building directory (see below), and r
 
 - [CanonNatExample/](CanonNatExample/) builds an executable from [coq_src/CanonNatExample.v](coq_src/CanonNatExample.v). It illustrates the use of [ImpHCons](coq_src/Impure/ImpHCons.v) in order to define in Coq a hconsed Peano's numbers.
 
-- [ImpRefExample/](ImpRefExample/) builds an executable from [coq_src/ImpRefExample.v](coq_src/ImpRefExample.v).
+- [BasicImpExample/](BasicImpExample/) builds an executable from [coq_src/BasicImpExample.v](coq_src/BasicImpExample.v). It explores basic features/limitations of the Impure library.

@@ -5,12 +5,12 @@ SRCD:=../coq_src
 OCB:=ocamlbuild -I coq_extracted -I ImpureOracles -lib unix
 
 run: coq_extracted
-	$(OCB) ImpRefExample.native
-	./ImpRefExample.native || echo
+	$(OCB) BasicImpExample.native
+	./BasicImpExample.native || echo
 
 debug: coq_extracted
-	$(OCB) -cflag -g -lflag -g ImpRefExample.byte
-	OCAMLRUNPARAM=b	./ImpRefExample.byte || echo
+	$(OCB) -cflag -g -lflag -g BasicImpExample.byte
+	OCAMLRUNPARAM=b	./BasicImpExample.byte || echo
 
 # Auxiliary defs
 
@@ -20,8 +20,8 @@ $(SRCD)/Makefile: $(SRCD)/_CoqProject
 $(SRCD)/Impure/ImpExtern.vo: $(SRCD)/Makefile $(SRCD)/Impure/*.v 
 	$(MAKE) -C $(SRCD) -j Impure/ImpExtern.vo
 
-$(SRCD)/ImpRefExample.vo coq_extracted: Makefile $(SRCD)/Impure/ImpExtern.vo $(SRCD)/ImpRefExample.v
-	rm -rf coq_extracted && mkdir coq_extracted && cd coq_extracted && coqc  -R ../$(SRCD) "ImpureDemo" -I ../$(SRCD) ../$(SRCD)/ImpRefExample.v
+$(SRCD)/BasicImpExample.vo coq_extracted: Makefile $(SRCD)/Impure/ImpExtern.vo $(SRCD)/BasicImpExample.v
+	rm -rf coq_extracted && mkdir coq_extracted && cd coq_extracted && coqc  -R ../$(SRCD) "ImpureDemo" -I ../$(SRCD) ../$(SRCD)/BasicImpExample.v
 
 clean:
 	$(OCB) -clean
