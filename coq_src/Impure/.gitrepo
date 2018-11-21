@@ -6,6 +6,6 @@
 [subrepo]
 	remote = git@github.com:boulme/Impure.git
 	branch = master
-	commit = f1cc9a53acd31eb9dc049fbeb5fc181eaaa32a3d
-	parent = 0a6edeb67e3f1cdf35805e2866a82f6de14c2347
+	commit = 7d2725913d14a9127c0c91c87ab080c1065b800d
+	parent = 0819ffb28c3a29bcd1437b8c77ccd3127b8b3253
 	cmdver = 0.3.1
