@@ -19,7 +19,63 @@ Inductive isfib: Z -> Z -> Prop :=
  | isfib_base p: (p <= 2) -> isfib p 1
  | isfib_rec p n1 n2: isfib p n1 -> isfib (p+1) n2 -> isfib (p+2) (n1+n2).
 
-(* Implementation of Fibonacci -- parametrized by the equality test *)
+
+Record iterfib_state := {
+  index: Z;
+  current: Z;
+  old: Z
+}.
+
+(* an iterative version from a while-loop *)
+Program Definition iterfib_x (p:Z) : ?? { r:Z | isfib p r } :=
+  match p <=? 2 with
+  | true => RET (exist _ 1 _)
+  | false =>
+    DO s <~ 
+      while (fun s => s.(index) <? p)
+            (fun s => RET {| index := s.(index)+1; current := s.(old) + s.(current); old:= s.(current) |})
+            {| index := 3; current := 2; old := 1 |}
+            (fun s => s.(index) <= p /\ isfib s.(index) s.(current) /\ isfib (s.(index)-1) s.(old)) ;;
+    RET (exist _ s.(current) _)
+   end.
+Obligation 1.
+  apply isfib_base.
+  generalize (Z.leb_spec p 2).
+  rewrite <- Heq_anonymous. intro Y; inversion Y; auto.
+Qed.
+Obligation 2.
+  generalize (Z.leb_spec p 2).
+  rewrite <- Heq_anonymous. intro Y; inversion Y; auto.
+  clear Y Heq_anonymous.
+  constructor 1; simpl.
+  + intuition try (omega).
+    - cutrewrite (2=(1+1)); auto.
+      cutrewrite (3=(1+2)); auto.
+      apply isfib_rec; apply isfib_base; omega.
+    - apply isfib_base; omega.
+  + intros s (H1 & H2 & H3) H4.
+    wlp_simplify. 
+    - generalize (Z.ltb_spec (index s) p); rewrite H4.
+      intro Y; inversion Y; omega.
+    - cutrewrite (index s + 1 = (index s - 1) + 2); try ring.
+      apply isfib_rec; try ring_simplify; auto.
+    - ring_simplify; auto.
+Qed.
+Obligation 3.
+  cutrewrite (p=(index s)); auto.
+  generalize (Z.ltb_spec (index s) p).
+  rewrite e. intro Y; inversion Y; omega.
+Qed.
+
+Definition iterfib(p:Z): ?? Z := DO r <~ iterfib_x p ;; RET (`r).
+
+Lemma iterfib_correct (x: Z): WHEN iterfib x ~> y THEN isfib x y.
+Proof.
+  wlp_simplify. destruct exta; auto.
+Qed.
+
+
+(* "Naive" recursive implementation of Fibonacci -- parametrized by the equality test *)
 Program Definition fib (beq: Z -> Z -> ?? bool) (X: beq_correct beq) (z: Z): ?? Z := 
   DO f <~ rec beq (fun (fib: Z -> ?? Z) p => 
     if p <=? 2
@@ -81,6 +137,8 @@ Definition print_fib (msg: pstring) (fib: Z -> ?? Z) (z: Z): ?? unit :=
 Definition test: ?? unit :=
   println "";;
   TRY
+     print_fib "starting iterfib(40)" iterfib 40;;
+     print_fib "starting iterfib(10000)" iterfib 10000;;
      xrec_set_option MemoRec;;
      print_fib "starting Memoized fib(40)" sfib 40;;
      print_fib "starting Memoized fib(10000)" sfib 10000;;
