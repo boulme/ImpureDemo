@@ -1,3 +1,5 @@
+(** Very basic examples of embedding imperative features in Coq through the Impure library *)
+
 Require Export ImpExtern.
 Require Extraction.
 Require Import Coq.Arith.PeanoNat.
@@ -10,6 +12,7 @@ Local Open Scope impure.
 Local Open Scope nat_scope.
 
 
+(* a trivial example of WLP reasoning *)
 Section TRIV_WLP.
 
 Variable f: nat -> ?? nat.
@@ -26,7 +29,9 @@ Qed.
 End TRIV_WLP.
 
 
-Section Empty_WLP.
+(* Examples showing that cyclic values must be forbidden on extraction of inductive types *)
+
+Section Issue_with_cyclic_value.
 
 Inductive empty: Type:= Absurd: empty -> empty.
 
@@ -37,8 +42,34 @@ Proof.
   clear Hexta.
   induction exta. auto.
 Qed.
+(* issue: in OCaml, the extraction of type [empty] is currently inhabited by a cyclic value *)
 
-End Empty_WLP.
+
+Definition is_zero (n:nat): bool :=
+  match n with
+  | O => true
+  | _ => false
+  end.
+
+
+Lemma is_zero_correct n: is_zero n = true <-> n = 0.
+Proof.
+  destruct n; simpl; intuition.
+Qed.
+
+
+Lemma phys_eq_pred n: WHEN phys_eq (pred n) n ~> b THEN b=true -> (is_zero n)=true.
+Proof.
+  wlp_simplify.
+  rewrite is_zero_correct; clear exta Hexta H0.
+  generalize H1; clear H1; induction n; simpl; auto.
+  intros H1; rewrite <- H1. apply IHn; clear IHn.
+  destruct n; simpl; auto.
+Qed.
+(* issue: in OCaml, the extraction of type [nat] is currently inhabited by a cyclic value [fuel] 
+   such that [pred fuel == fuel] returns [true] and [is_zero fuel] returns [false].  *)
+
+End Issue_with_cyclic_value.
 
 
 Section Pseudo_Identity.
@@ -57,9 +88,11 @@ Qed.
 
 End Pseudo_Identity.
 
+
+
 Module TestNat.
 
-(* Now, we can embed invariants into these Coq references 
+(* Now, we embed invariants into Coq references 
 
 Here is a tiny example...
 
@@ -77,7 +110,7 @@ Indeed, this is false for another implementation of make:
 
 More generally, I can not prove anything about "get" except that if it returns a value then the value inhabits its type.
 
-Here, be aware that we can define aliases in Coq, even if can not reason about them.
+Here, be aware that we can define aliases in Coq, even if we cannot reason about them.
 
 *)
 
