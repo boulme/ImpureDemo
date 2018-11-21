@@ -7,5 +7,5 @@
 	remote = git@github.com:boulme/Impure.git
 	branch = master
 	commit = 7d2725913d14a9127c0c91c87ab080c1065b800d
-	parent = 0819ffb28c3a29bcd1437b8c77ccd3127b8b3253
+	parent = 284f916786130210fae9c3a247d47bd5b2e30e10
 	cmdver = 0.3.1
