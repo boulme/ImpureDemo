@@ -20,60 +20,52 @@ Inductive isfib: Z -> Z -> Prop :=
  | isfib_rec p n1 n2: isfib p n1 -> isfib (p+1) n2 -> isfib (p+2) (n1+n2).
 
 
+(* an iterative version from a while-loop *)
 Record iterfib_state := {
   index: Z;
   current: Z;
   old: Z
 }.
 
-(* an iterative version from a while-loop *)
-Program Definition iterfib_x (p:Z) : ?? { r:Z | isfib p r } :=
-  match p <=? 2 with
-  | true => RET (exist _ 1 _)
-  | false =>
+Program Definition iterfib (p:Z) : ?? Z :=
+  if p <=? 2
+  then RET 1
+  else
     DO s <~ 
-      while (fun s => s.(index) <? p)
-            (fun s => RET {| index := s.(index)+1; current := s.(old) + s.(current); old:= s.(current) |})
-            {| index := 3; current := 2; old := 1 |}
-            (fun s => s.(index) <= p /\ isfib s.(index) s.(current) /\ isfib (s.(index)-1) s.(old)) ;;
-    RET (exist _ s.(current) _)
-   end.
+      while 
+        (* cnd *) (fun s => s.(index) <? p)
+        (* bdy *) (fun s => RET {| index := s.(index)+1; current := s.(old) + s.(current); old:= s.(current) |})
+        (* inv *) (fun s => s.(index) <= p /\ isfib s.(index) s.(current) /\ isfib (s.(index)-1) s.(old))
+        {| index := 3; current := 2; old := 1 |};;
+    RET (s.(current)).
 Obligation 1.
-  apply isfib_base.
-  generalize (Z.leb_spec p 2).
-  rewrite <- Heq_anonymous. intro Y; inversion Y; auto.
-Qed.
-Obligation 2.
-  generalize (Z.leb_spec p 2).
-  rewrite <- Heq_anonymous. intro Y; inversion Y; auto.
-  clear Y Heq_anonymous.
-  constructor 1; simpl.
-  + intuition try (omega).
-    - cutrewrite (2=(1+1)); auto.
-      cutrewrite (3=(1+2)); auto.
-      apply isfib_rec; apply isfib_base; omega.
-    - apply isfib_base; omega.
-  + intros s (H1 & H2 & H3) H4.
-    wlp_simplify. 
-    - generalize (Z.ltb_spec (index s) p); rewrite H4.
-      intro Y; inversion Y; omega.
-    - cutrewrite (index s + 1 = (index s - 1) + 2); try ring.
-      apply isfib_rec; try ring_simplify; auto.
-    - ring_simplify; auto.
-Qed.
-Obligation 3.
-  cutrewrite (p=(index s)); auto.
-  generalize (Z.ltb_spec (index s) p).
-  rewrite e. intro Y; inversion Y; omega.
+  wlp_simplify.
+  - generalize (Z.ltb_spec (index s) p); rewrite H0.
+    intro Y; inversion Y; omega.
+  - cutrewrite (index s + 1 = (index s - 1) + 2); try ring.
+    apply isfib_rec; try ring_simplify; auto.
+  - ring_simplify; auto.
 Qed.
 
-Definition iterfib(p:Z): ?? Z := DO r <~ iterfib_x p ;; RET (`r).
-
-Lemma iterfib_correct (x: Z): WHEN iterfib x ~> y THEN isfib x y.
+Lemma iterfib_correct (p: Z): WHEN iterfib p ~> r THEN isfib p r.
 Proof.
-  wlp_simplify. destruct exta; auto.
+  unfold iterfib. wlp_simplify.
+  -  apply isfib_base.
+     generalize (Z.leb_spec p 2).
+     rewrite H. intro Y; inversion Y; auto.
+  -  generalize (Z.leb_spec p 2).
+     rewrite H. intro Y; inversion Y as [ H0 | ]; clear Y H.
+     destruct exta as [s X]; simpl; clear Hexta.
+     destruct X as ((H1 & H2 & H3) & H4).
+    + intuition try (omega).
+      * cutrewrite (2=(1+1)); auto.
+        cutrewrite (3=(1+2)); auto.
+        apply isfib_rec; apply isfib_base; omega.
+      * apply isfib_base; omega.
+    + cutrewrite (p=(index s)); auto.
+      generalize (Z.ltb_spec (index s) p).
+      rewrite H4. intro Y; inversion Y; omega.
 Qed.
-
 
 (* "Naive" recursive implementation of Fibonacci -- parametrized by the equality test *)
 Program Definition fib (beq: Z -> Z -> ?? bool) (X: beq_correct beq) (z: Z): ?? Z := 
