@@ -104,9 +104,30 @@ Proof.
   wlp_simplify.
 Qed.
 
+(* Combining physical equality and structural equality on Z 
+
+Definition Z_eqb (x y: Z): ?? bool :=
+  DO b <~ phys_eq x y ;;
+  if b 
+  then RET true
+  else RET (Z.eqb x y).
+
+Lemma Z_eqb_correct x y: 
+  WHEN (Z_eqb x y) ~> b THEN b=true -> x=y.
+Proof.
+  wlp_simplify.
+  generalize (Z.eqb_spec x y).
+  rewrite H0; intro Y; inversion Y; auto.
+Qed.
+Global Opaque Z_eqb.
+Local Hint Resolve Z_eqb_correct.
+
+NB: not the most efficient in practice ?
+*)
+
 (* Fibonacci function using structural equality on Z *)
 Program Definition sfib x: ?? Z :=
-   fib (fun x y => RET (Z.eqb x y)) _ x.
+   fib (fun x y => RET (Z.eqb x y))  _ x.
 Obligation 1.
   unfold beq_correct; wlp_simplify.
   generalize (Z.eqb_spec x0 y).
