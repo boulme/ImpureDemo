@@ -183,5 +183,5 @@ Import ImpConfig.
 
 Extraction Blacklist List String.
 
-Separate Extraction BinIntDef TestNat.
+Separate Extraction BinInt TestNat.
 

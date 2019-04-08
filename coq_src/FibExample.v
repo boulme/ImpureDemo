@@ -181,5 +181,5 @@ Import ImpConfig.
 
 Extraction Blacklist List String.
 
-Separate Extraction BinIntDef ImpLoops TestFib.
+Separate Extraction BinInt ImpLoops TestFib.
 
