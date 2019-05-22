@@ -25,7 +25,7 @@ Hypothesis hC_correct: forall n, WHEN hC n ~> n' THEN data (hdata n)=data n'.
 
 Definition hO: unit -> ?? hashV nat := 
   fun _ =>
-    hC {| hdata := liftHV 0; hcodes := [] ; debug_info := None |}.
+    hC {| hdata := liftHV 0; hcodes := [] |}.
 
 Local Hint Resolve hC_correct.
 
@@ -39,7 +39,7 @@ Hint Resolve hO_correct: wlp.
 
 Definition hS: hashV nat -> ?? hashV nat :=
   fun x => 
-    hC {| hdata :=liftHV (S (data x)); hcodes := [hid x]; debug_info := None |}.
+    hC {| hdata :=liftHV (S (data x)); hcodes := [hid x] |}.
 
 Lemma hS_correct n: 
   WHEN hS n ~> n' THEN (data n')=(S (data n)).
