@@ -84,7 +84,7 @@ Obligation 1.
   + apply isfib_base.
     generalize (Z.leb_spec x 2).
     rewrite H. intro Y; inversion Y; auto.
-  + cutrewrite (x = (x - 1 - 1) + 2).
+  + replace x with ((x - 1 - 1) + 2).
     eapply isfib_rec; auto.
     * eapply H0; eauto.
     * ring_simplify.
