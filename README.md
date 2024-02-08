@@ -27,10 +27,14 @@ of a memoized version of the naive Fibonacci function.  However,
 currently, the soundness of these parametric proofs is still a
 conjecture.
 
-A more significant use case of [Impure](https://github.com/boulme/Impure) is provided by [satans-cert](https://github.com/boulme/satans-cert) -- a certified checker of (Boolean) sat-solver answers.
+For more details, see [this document](https://hal.science/tel-03356701).
+
+## Other Significant Use Cases
+
+[Impure/](https://github.com/boulme/Impure) is part of [Chamois CompCert](https://gricad-gitlab.univ-grenoble-alpes.fr/certicompil/Chamois-CompCert).
+An older version is used by [satans-cert](https://github.com/boulme/satans-cert) -- a certified checker of (Boolean) sat-solver answers.
 The ancester of `Impure` is also present in the [Verified Polyhedra Library](https://github.com/VERIMAG-Polyhedra/VPL).
 
-See [a draft paper on this work](https://hal.archives-ouvertes.fr/hal-02062288).
 
 ## Credits
 
@@ -40,11 +44,11 @@ See [a draft paper on this work](https://hal.archives-ouvertes.fr/hal-02062288).
 
 ### Requirements
 
-1. [ocaml](https://ocaml.org/docs/install.html). Tested with versions >= 4.05 and <= 4.07.1. (But other versions should work too).
+1. [ocaml](https://ocaml.org/docs/install.html). Tested with version 4.14.1. (But other versions should work too).
 
-2. [ocamlbuild](https://github.com/ocaml/ocamlbuild). Tested with version 0.12.0 and 0.14.0. (But other versions should work too).
+2. [ocamlbuild](https://github.com/ocaml/ocamlbuild). Tested with 0.14.2. (But other versions should work too).
 
-3. [coq](https://coq.inria.fr/). Tested with versions >= 8.8.2 and <= 8.9.0. Here, other versions are likely to not work !
+3. [coq](https://coq.inria.fr/). Tested with versions 8.16.1. 
 
 ### Compilation
 

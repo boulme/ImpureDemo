@@ -3,7 +3,7 @@
 Require Export ImpExtern.
 Require Extraction.
 Require Import Coq.Arith.PeanoNat.
-Require Import Omega.
+Require Import Lia.
 
 Import Notations.
 Local Open Scope impure.
@@ -23,7 +23,7 @@ Definition g (x:nat): ?? nat :=
 
 Lemma triv: forall x, WHEN g x ~> r THEN r > 0.
 Proof.
-  wlp_simplify. omega.
+  wlp_simplify. lia.
 Qed.
 
 End TRIV_WLP.

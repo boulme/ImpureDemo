@@ -8,7 +8,7 @@ Require Import ImpExtern.
 Import Notations.
 Local Open Scope impure.
 
-
+Require Import Lia.
 Require Import ZArith.
 Local Open Scope Z.
 
@@ -41,8 +41,8 @@ Program Definition iterfib (p:Z) : ?? Z :=
 Obligation 1.
   wlp_simplify.
   - generalize (Z.ltb_spec (index s) p); rewrite H0.
-    intro Y; inversion Y; omega.
-  - cutrewrite (index s + 1 = (index s - 1) + 2); try ring.
+    intro Y; inversion Y; lia.
+  - replace (index s + 1) with ((index s - 1) + 2); try ring.
     apply isfib_rec; try ring_simplify; auto.
   - ring_simplify; auto.
 Qed.
@@ -57,14 +57,14 @@ Proof.
      rewrite H. intro Y; inversion Y as [ H0 | ]; clear Y H.
      destruct exta as [s X]; simpl; clear Hexta.
      destruct X as ((H1 & H2 & H3) & H4).
-    + intuition try (omega).
-      * cutrewrite (2=(1+1)); auto.
-        cutrewrite (3=(1+2)); auto.
-        apply isfib_rec; apply isfib_base; omega.
-      * apply isfib_base; omega.
-    + cutrewrite (p=(index s)); auto.
+    + intuition try (lia).
+      * replace 2 with (1+1); auto.
+        replace 3 with (1+2); auto.
+        apply isfib_rec; apply isfib_base; lia.
+      * apply isfib_base; lia.
+    + replace p with (index s); auto.
       generalize (Z.ltb_spec (index s) p).
-      rewrite H4. intro Y; inversion Y; omega.
+      rewrite H4. intro Y; inversion Y; lia.
 Qed.
 
 (* "Naive" recursive implementation of Fibonacci -- parametrized by the equality test *)
