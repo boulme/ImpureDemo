@@ -142,7 +142,7 @@ Local Open Scope string_scope.
 Definition test1: ?? unit :=
   DO r1 <~ make_cref 10 ;;
   DO v <~ alias_example r1;;
-  assert_b (Nat.eqb v 0) "Ok: we cannot prove this. It depends on the implementation of make.";;
+  assert_b (Nat.eqb v 0) "Ok: we cannot prove this. It depends on the implementation of make_cref.";;
   RET tt.
 
 
@@ -156,7 +156,10 @@ Lemma mydata_preserved (x: cref mydata) (y: cref nat):
     v.(value) > 10.
 Proof.
   wlp_simplify. destruct exta0; simpl; auto.
-Qed. 
+Qed.
+
+
+(** wrong IO reasoning **)
 
 Fixpoint repeat (n:nat) (k: unit -> ?? unit): ?? unit :=
   match n with

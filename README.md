@@ -25,7 +25,8 @@ end of [ImpLoops](coq_src/Impure/ImpLoops.v).  This lemma is applied
 in [FibExample](coq_src/FibExample.v) to prove the partial correctness
 of a memoized version of the naive Fibonacci function.  However,
 currently, the soundness of these parametric proofs is still a
-conjecture.
+conjecture. The [Linking Types](https://dbp.io/pubs/2023/lt.pdf) technique of Daniel Patterson, Andrew Wagner and Amal Ahmed
+(published as a [TypeDe'2023 paper](https://dl.acm.org/doi/10.1145/3609027.3609405)) could provide an approach to tackle it! 
 
 For more details, see [this document](https://hal.science/tel-03356701).
 
@@ -58,8 +59,10 @@ After cloning, just change directory for a building directory (see below), and r
 
 [coq_src/](coq_src/) contains the Coq sources. Other directories aims to build examples of binaries.
 
-- [FibExample/](FibExample/) builds an executable from [coq_src/FibExample.v](coq_src/FibExample.v). It illustrates the use of [ImpLoops](coq_src/Impure/ImpLoops.v) in order to certify in Coq the memoized version of a naive recursive definition of Fibonacci's function.
+- [FixTypeSafety/](FixTypeSafety/)  builds an executable from [coq_src/FixTypeSafety.v](coq_src/FixTypeSafety.v). It first provides an example from David Monniaux illustrating that linking Coq extracted and OCaml code without caution may break type-safety. Then, it illustrates how this example cannot break type-safety by wrapping the OCaml code within the Impure monad.
 
-- [CanonNatExample/](CanonNatExample/) builds an executable from [coq_src/CanonNatExample.v](coq_src/CanonNatExample.v). It illustrates the use of [ImpHCons](coq_src/Impure/ImpHCons.v) in order to define in Coq a hconsed Peano's numbers.
+- [FibExample/](FibExample/) builds an executable from [coq_src/FibExample.v](coq_src/FibExample.v). It illustrates the use of [ImpLoops](coq_src/Impure/ImpLoops.v) in order to certify in Coq the memoized fixpoint of the naive recursive definition of Fibonacci's function.
+
+- [CanonNatExample/](CanonNatExample/) builds an executable from [coq_src/CanonNatExample.v](coq_src/CanonNatExample.v). It illustrates the use of [ImpHCons](coq_src/Impure/ImpHCons.v) in order to define in Coq hash-consed Peano's numbers.
 
 - [BasicImpExample/](BasicImpExample/) builds an executable from [coq_src/BasicImpExample.v](coq_src/BasicImpExample.v). It explores basic features/limitations of the Impure library.
